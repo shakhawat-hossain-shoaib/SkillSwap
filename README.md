@@ -88,3 +88,11 @@ dotnet test backend/tests/SkillSwap.Tests/SkillSwap.Tests.csproj
 - **Admin Password**: `AdminSkillSwap2026!`
 - **Demo User 1**: `sarah.jenkins@example.com` / `AdminSkillSwap2026!`
 - **Demo User 2**: `alex.rivera@example.com` / `AdminSkillSwap2026!`
+
+---
+
+## 👥 Development Team
+- **Shakhawat Hossain Shoaib** ([@shakhawat-hossain-shoaib](https://github.com/shakhawat-hossain-shoaib)) — *User Profiles, AI Matchmaking & System Integration*
+- **Abid** ([@abid-0203](https://github.com/abid-0203)) — *Database Architecture & Authentication Service*
+- **Partha Sharma** ([@partha-sharma](https://github.com/partha-sharma)) — *Exchange Workflows & Real-Time Messaging (SignalR)*
+- **Hasan Al Mahamud** ([@hasan-al-mahamud](https://github.com/hasan-al-mahamud)) — *Peer Bootcamps, Reviews & DevOps Orchestration*
