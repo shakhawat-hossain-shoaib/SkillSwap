@@ -1,0 +1,75 @@
+services:
+  # ══════════════════════════════════════════════════════════════════════════
+  # 1. DATABASE SERVICE (MySQL 8.0)
+  # ══════════════════════════════════════════════════════════════════════════
+  database:
+    image: mysql:8.0
+    container_name: skillswap-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: SkillSwapDb
+      MYSQL_USER: skillswap_user
+      MYSQL_PASSWORD: skillswap_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - skillswap-network
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 2. BACKEND SERVICE (ASP.NET Core Web API .NET 10)
+  # ══════════════════════════════════════════════════════════════════════════
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skillswap-backend
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5080
+      - ConnectionStrings__DefaultConnection=Server=database;Port=3306;Database=SkillSwapDb;User=root;Password=rootpassword;
+      - JwtSettings__SecretKey=SkillSwap-Super-Secret-Key-Change-In-Production-Min-32-Chars!!
+      - JwtSettings__Issuer=SkillSwap.Api
+      - JwtSettings__Audience=SkillSwap.Client
+      - JwtSettings__ExpirationMinutes=1440
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    ports:
+      - "5080:5080"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - skillswap-network
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 3. FRONTEND SERVICE (React + Vite + Nginx)
+  # ══════════════════════════════════════════════════════════════════════════
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: skillswap-frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - skillswap-network
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  skillswap-network:
+    driver: bridge
