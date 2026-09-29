@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -58,15 +59,35 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AdminAuthProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-          <SwapAIAssistant />
-          <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-        </BrowserRouter>
-      </AuthProvider>
-    </AdminAuthProvider>
+    <ThemeProvider>
+      <AdminAuthProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <AppRoutes />
+            <SwapAIAssistant />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3500,
+                className: 'dark:!bg-slate-900 dark:!text-slate-100 dark:!border dark:!border-slate-800 shadow-xl rounded-xl text-sm font-medium',
+                success: {
+                  iconTheme: {
+                    primary: '#10b981',
+                    secondary: '#ffffff',
+                  },
+                },
+                error: {
+                  iconTheme: {
+                    primary: '#ef4444',
+                    secondary: '#ffffff',
+                  },
+                },
+              }}
+            />
+          </BrowserRouter>
+        </AuthProvider>
+      </AdminAuthProvider>
+    </ThemeProvider>
   );
 }
 

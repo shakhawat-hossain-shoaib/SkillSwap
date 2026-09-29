@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../common/Button';
+import { ThemeToggle } from '../common/ThemeToggle';
 import api from '../../lib/axios';
 import {
   LayoutDashboard,
@@ -162,17 +163,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors">
       {/* Mobile Header Bar */}
-      <div className="md:hidden bg-white border-b border-gray-200 px-4 h-16 flex items-center justify-between sticky top-0 z-40">
-        <Link to="/" className="flex items-center gap-2 text-primary-900 font-bold">
+      <div className="md:hidden bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 h-16 flex items-center justify-between sticky top-0 z-40 transition-colors">
+        <Link to="/" className="flex items-center gap-2 text-primary-900 dark:text-white font-bold">
           <Repeat className="h-6 w-6 text-accent-500" />
           <span className="font-display font-bold text-lg">SkillSwap</span>
         </Link>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 relative"
+            className="p-2 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 relative"
           >
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
@@ -181,14 +183,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </button>
           <button
             onClick={handleLogout}
-            className="p-2 rounded-lg text-red-600 hover:bg-red-50"
+            className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
             title="Log out"
           >
             <LogOut className="h-5 w-5" />
           </button>
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100"
+            className="p-2 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800"
           >
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -197,17 +199,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Static Fixed Sidebar for Desktop & Mobile Overlay */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0 flex-shrink-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col transition-transform duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0 flex-shrink-0 ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand Logo */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100">
-          <Link to="/" className="flex items-center gap-2.5 text-primary-900 hover:text-primary-600 transition-colors">
+        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100 dark:border-slate-800/80">
+          <Link to="/" className="flex items-center gap-2.5 text-primary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-primary-600 to-accent-500 flex items-center justify-center text-white shadow-xs select-none">
               <Repeat className="h-4 w-4" />
             </div>
-            <span className="font-display font-extrabold text-xl tracking-tight text-primary-900">
+            <span className="font-display font-extrabold text-xl tracking-tight text-primary-900 dark:text-white">
               SkillSwap
             </span>
           </Link>
@@ -300,25 +302,26 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header for Desktop */}
-        <header className="hidden md:flex h-16 bg-white border-b border-gray-200 items-center justify-between px-8 sticky top-0 z-30 shadow-xs">
+        <header className="hidden md:flex h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 items-center justify-between px-8 sticky top-0 z-30 shadow-xs transition-colors">
           <div className="flex items-center gap-3 w-96">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
               <input
                 type="text"
                 placeholder="Search bootcamps, peers, or skills..."
-                className="w-full pl-9 pr-4 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full pl-9 pr-4 py-1.5 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-slate-800 transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle showLabel={true} />
 
             {/* Notifications toggle */}
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="p-2 rounded-full text-gray-500 hover:bg-gray-100 relative transition-colors"
+                className="p-2 rounded-full text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 relative transition-colors"
                 aria-label="Notifications"
               >
                 <Bell className="h-5 w-5" />

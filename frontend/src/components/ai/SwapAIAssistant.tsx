@@ -131,15 +131,15 @@ export function SwapAIAssistant() {
             const num = line.trim().match(/^(\d+\.)\s*/)?.[1];
             const clean = line.trim().replace(/^\d+\.\s*/, '');
             return (
-              <div key={idx} className="flex items-start gap-1.5 pl-1 text-gray-700">
-                <span className="font-bold text-primary-600 flex-shrink-0">{num}</span>
+              <div key={idx} className="flex items-start gap-1.5 pl-1 text-gray-700 dark:text-slate-300">
+                <span className="font-bold text-primary-600 dark:text-accent-400 flex-shrink-0">{num}</span>
                 <span dangerouslySetInnerHTML={{ __html: parseBold(clean) }} />
               </div>
             );
           }
 
           return (
-            <p key={idx} className="text-gray-700" dangerouslySetInnerHTML={{ __html: parseBold(line) }} />
+            <p key={idx} className="text-gray-700 dark:text-slate-300" dangerouslySetInnerHTML={{ __html: parseBold(line) }} />
           );
         })}
       </div>
@@ -148,15 +148,15 @@ export function SwapAIAssistant() {
 
   const parseBold = (str: string) => {
     return str
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-900">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic text-gray-600">$1</em>');
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-900 dark:text-white">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic text-gray-600 dark:text-slate-400">$1</em>');
   };
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end">
       {/* Floating Chat Assistant Modal */}
       {isOpen && (
-        <div className="w-[360px] sm:w-[410px] h-[540px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-gray-200/80 flex flex-col overflow-hidden mb-3 animate-in fade-in slide-in-from-bottom-6 duration-200">
+        <div className="w-[360px] sm:w-[410px] h-[540px] max-h-[85vh] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-gray-200/80 dark:border-slate-800 flex flex-col overflow-hidden mb-3 animate-in fade-in slide-in-from-bottom-6 duration-200 transition-colors">
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-accent-700 p-4 text-white flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-3">
@@ -198,18 +198,18 @@ export function SwapAIAssistant() {
           </div>
 
           {/* Prompt Filtering Guardrail Notice */}
-          <div className="bg-primary-50/80 border-b border-primary-100/60 px-3.5 py-1.5 flex items-center justify-between text-[11px] text-primary-900">
+          <div className="bg-primary-50/80 dark:bg-slate-800/80 border-b border-primary-100/60 dark:border-slate-700/60 px-3.5 py-1.5 flex items-center justify-between text-[11px] text-primary-900 dark:text-accent-300">
             <span className="flex items-center gap-1 font-medium">
-              <ShieldCheck className="h-3.5 w-3.5 text-accent-600" />
+              <ShieldCheck className="h-3.5 w-3.5 text-accent-600 dark:text-accent-400" />
               Filtered for SkillSwap topics only
             </span>
-            <span className="text-[10px] text-primary-600 font-semibold uppercase tracking-wider">
+            <span className="text-[10px] text-primary-600 dark:text-primary-400 font-semibold uppercase tracking-wider">
               SwapAI
             </span>
           </div>
 
           {/* Messages Feed */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/60">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/60 dark:bg-slate-950/60">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -224,8 +224,8 @@ export function SwapAIAssistant() {
                 <div
                   className={`max-w-[82%] p-3 rounded-2xl ${
                     msg.sender === 'user'
-                      ? 'bg-primary-900 text-white rounded-br-xs shadow-xs'
-                      : 'bg-white border border-gray-200/80 rounded-tl-xs shadow-xs text-gray-800'
+                      ? 'bg-primary-900 dark:bg-primary-600 text-white rounded-br-xs shadow-xs'
+                      : 'bg-white dark:bg-slate-800 border border-gray-200/80 dark:border-slate-700/80 rounded-tl-xs shadow-xs text-gray-800 dark:text-slate-100'
                   }`}
                 >
                   {msg.sender === 'user' ? (
@@ -236,7 +236,7 @@ export function SwapAIAssistant() {
 
                   <span
                     className={`block text-[9px] mt-1 text-right ${
-                      msg.sender === 'user' ? 'text-primary-200' : 'text-gray-400'
+                      msg.sender === 'user' ? 'text-primary-200' : 'text-gray-400 dark:text-slate-500'
                     }`}
                   >
                     {msg.timestamp}
@@ -250,11 +250,11 @@ export function SwapAIAssistant() {
                 <div className="h-7 w-7 rounded-xl bg-gradient-to-tr from-primary-600 to-accent-500 flex-shrink-0 flex items-center justify-center text-white shadow-xs animate-pulse">
                   <Bot className="h-3.5 w-3.5" />
                 </div>
-                <div className="bg-white border border-gray-200/80 p-3 rounded-2xl rounded-tl-xs shadow-xs flex items-center gap-1.5">
+                <div className="bg-white dark:bg-slate-800 border border-gray-200/80 dark:border-slate-700/80 p-3 rounded-2xl rounded-tl-xs shadow-xs flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="h-2 w-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: '150ms' }} />
                   <span className="h-2 w-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                  <span className="text-[11px] text-gray-400 ml-1 font-medium">SwapAI is typing...</span>
+                  <span className="text-[11px] text-gray-400 dark:text-slate-400 ml-1 font-medium">SwapAI is typing...</span>
                 </div>
               </div>
             )}
@@ -263,14 +263,14 @@ export function SwapAIAssistant() {
           </div>
 
           {/* Quick Questions Suggestions */}
-          <div className="px-3 pt-2 pb-1 bg-white border-t border-gray-100 flex gap-1.5 overflow-x-auto text-[11px]">
+          <div className="px-3 pt-2 pb-1 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 flex gap-1.5 overflow-x-auto text-[11px]">
             {QUICK_PROMPTS.map((prompt, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => handleSend(prompt)}
                 disabled={isLoading}
-                className="px-2.5 py-1 rounded-full bg-gray-100 hover:bg-primary-50 hover:text-primary-800 text-gray-600 text-[11px] font-medium transition-colors flex-shrink-0 flex items-center gap-1 whitespace-nowrap disabled:opacity-50"
+                className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-slate-700 hover:text-primary-800 dark:hover:text-white text-gray-600 dark:text-slate-300 text-[11px] font-medium transition-colors flex-shrink-0 flex items-center gap-1 whitespace-nowrap disabled:opacity-50"
               >
                 <HelpCircle className="h-3 w-3 text-accent-500" />
                 {prompt}
@@ -279,7 +279,7 @@ export function SwapAIAssistant() {
           </div>
 
           {/* Input Box */}
-          <div className="p-3 bg-white border-t border-gray-100">
+          <div className="p-3 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -294,7 +294,7 @@ export function SwapAIAssistant() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isLoading}
-                className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-3.5 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all placeholder:text-gray-400"
+                className="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-slate-800 transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500"
               />
 
               <button

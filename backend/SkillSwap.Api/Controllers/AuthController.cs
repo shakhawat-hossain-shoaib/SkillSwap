@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SkillSwap.Api.DTOs;
 using SkillSwap.Api.Models;
 using SkillSwap.Api.Repositories;
@@ -8,6 +9,7 @@ namespace SkillSwap.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("auth-policy")]
 public class AuthController : ControllerBase
 {
     private readonly IRepository<User> _userRepository;
@@ -27,10 +29,20 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
     {
-        var email = !string.IsNullOrWhiteSpace(request.EmailAddress) ? request.EmailAddress : request.Email;
+        var email = (!string.IsNullOrWhiteSpace(request.EmailAddress) ? request.EmailAddress : request.Email)?.Trim();
         if (string.IsNullOrWhiteSpace(email))
         {
             return BadRequest(new AuthResponseDto { Success = false, Error = "Email is required." });
+        }
+
+        if (!SkillSwap.Api.Common.SecurityHelper.IsValidEmail(email))
+        {
+            return BadRequest(new AuthResponseDto { Success = false, Error = "Please enter a valid email address." });
+        }
+
+        if (!SkillSwap.Api.Common.SecurityHelper.ValidatePasswordStrength(request.Password, out var passwordError))
+        {
+            return BadRequest(new AuthResponseDto { Success = false, Error = passwordError });
         }
 
         var existingUsers = await _userRepository.FindAsync(u => u.EmailAddress == email);
@@ -40,9 +52,15 @@ public class AuthController : ControllerBase
             return BadRequest(new AuthResponseDto { Success = false, Error = "Email already in use." });
         }
 
+        var sanitizedFullName = SkillSwap.Api.Common.SecurityHelper.SanitizeInput(request.FullName);
+        if (string.IsNullOrWhiteSpace(sanitizedFullName))
+        {
+            sanitizedFullName = "SkillSwap Member";
+        }
+
         var newUser = new User
         {
-            FullName = request.FullName,
+            FullName = sanitizedFullName,
             EmailAddress = email,
             PasswordHash = _passwordHasher.HashPassword(request.Password),
             RefreshToken = Guid.NewGuid().ToString(),

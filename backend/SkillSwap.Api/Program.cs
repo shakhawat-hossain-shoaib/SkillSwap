@@ -1,5 +1,7 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -110,7 +112,47 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Admin"));
+        policy.RequireRole("Admin", "SuperAdmin"));
+});
+
+// ════════════════════════════════════════════════════════════════════
+//  RATE LIMITING — Protection against DDoS, Brute Force & API Abuse
+// ════════════════════════════════════════════════════════════════════
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Global sliding window limiter for general API requests: 100 requests per minute
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        var clientIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: clientIp,
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 4,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 10
+            });
+    });
+
+    // Strict policy for Auth/Login: 5 attempts per minute per IP to mitigate brute force
+    options.AddFixedWindowLimiter("auth-policy", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+
+    // AI & Matchmaking limiter: 15 requests per minute per IP
+    options.AddFixedWindowLimiter("ai-policy", opt =>
+    {
+        opt.PermitLimit = 15;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 2;
+    });
 });
 
 // ════════════════════════════════════════════════════════════════════
@@ -188,6 +230,12 @@ var app = builder.Build();
 
 // ── Global error handler (first in pipeline to catch everything) ──
 app.UseGlobalExceptionHandler();
+
+// ── Security Headers ──
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
+// ── Rate Limiting ──
+app.UseRateLimiter();
 
 // ── Swagger (all environments for now, restrict in prod later) ────
 app.UseSwagger();

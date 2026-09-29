@@ -11,6 +11,7 @@ namespace SkillSwap.Api.Controllers;
 
 [ApiController]
 [Route("api/admin")]
+[Authorize(Roles = "Admin,SuperAdmin")]
 public class AdminController : ControllerBase
 {
     private readonly SkillSwapDbContext _dbContext;
@@ -30,6 +31,7 @@ public class AdminController : ControllerBase
     /// <summary>
     /// Authenticates an administrator against the Admins table in the database.
     /// </summary>
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AdminLoginRequest request)
     {
@@ -136,6 +138,17 @@ public class AdminController : ControllerBase
         }
 
         var normalizedEmail = request.Email.Trim().ToLower();
+
+        if (!SkillSwap.Api.Common.SecurityHelper.IsValidEmail(normalizedEmail))
+        {
+            return BadRequest(new { success = false, message = "Please provide a valid admin email address." });
+        }
+
+        if (!SkillSwap.Api.Common.SecurityHelper.ValidatePasswordStrength(request.Password, out var passErr))
+        {
+            return BadRequest(new { success = false, message = passErr });
+        }
+
         var exists = await _dbContext.Admins.AnyAsync(a => a.EmailAddress.ToLower() == normalizedEmail);
         if (exists)
         {
@@ -144,7 +157,7 @@ public class AdminController : ControllerBase
 
         var newAdmin = new Admin
         {
-            FullName = request.FullName.Trim(),
+            FullName = SkillSwap.Api.Common.SecurityHelper.SanitizeInput(request.FullName),
             EmailAddress = normalizedEmail,
             PasswordHash = _passwordHasher.HashPassword(request.Password),
             Role = string.IsNullOrWhiteSpace(request.Role) ? "Admin" : request.Role.Trim(),
